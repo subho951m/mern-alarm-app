@@ -26,6 +26,6 @@ router.post("/", createAlarm);
 router.delete("/:id", deleteAlarm);
 
 // UPDATE an alarm
-router.patch("/:id", updateAlarm);
+router.put("/:id", updateAlarm);
 
 module.exports = router;

@@ -45,6 +45,7 @@ export default function Home() {
       fetchAlarms();
     }
   }, [dispatch, user]);
+  const [isEditAlarm, setIsEditAlarm] = useState(null);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   console.log(alarms);
@@ -74,19 +75,35 @@ export default function Home() {
                   Alarm
                 </ListSubheader>
               )} */}
-                <Alarm alarm={alarm} />
+                <Alarm
+                  alarm={alarm}
+                  setIsEditAlarm={setIsEditAlarm}
+                  handleOpen={handleOpen}
+                />
               </React.Fragment>
             ))}
         </List>
       </Paper>
       <AppBar position="fixed" color="primary" sx={{ top: "auto", bottom: 0 }}>
         <Toolbar>
-          <StyledFab color="secondary" aria-label="add" onClick={handleOpen}>
+          <StyledFab
+            color="secondary"
+            aria-label="add"
+            onClick={() => {
+              setIsEditAlarm(null);
+              handleOpen();
+            }}
+          >
             <AddIcon />
           </StyledFab>
         </Toolbar>
       </AppBar>
-      <CardModal open={open} setOpen={setOpen} />
+      <CardModal
+        open={open}
+        setOpen={setOpen}
+        isEditAlarm={isEditAlarm}
+        setIsEditAlarm={setIsEditAlarm}
+      />
     </React.Fragment>
   );
 }

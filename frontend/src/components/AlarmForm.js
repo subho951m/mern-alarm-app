@@ -12,10 +12,20 @@ export default function AlarmForm(props) {
   const { dispatch } = useAlarmsContext();
   const { user } = useAuthContext();
 
-  const [time, setTime] = useState(dayjs("2022-04-17T15:30"));
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [state, setState] = useState(true);
+  const [time, setTime] = useState(
+    props.isEditAlarm === null
+      ? dayjs("2022-04-17T15:30")
+      : dayjs(props.isEditAlarm.time)
+  );
+  const [title, setTitle] = useState(
+    props.isEditAlarm === null ? "" : props.isEditAlarm.title
+  );
+  const [description, setDescription] = useState(
+    props.isEditAlarm === null ? "" : props.isEditAlarm.description
+  );
+  const [state, setState] = useState(
+    props.isEditAlarm === null ? true : props.isEditAlarm.state
+  );
   const [error, setError] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
 
@@ -29,8 +39,14 @@ export default function AlarmForm(props) {
 
     const alarm = { time, title, description, state };
 
-    const response = await fetch("/api/alarms", {
-      method: "POST",
+    const endpoint = `/api/alarms${
+      props.isEditAlarm === null ? "" : `/${props.isEditAlarm._id}`
+    }`;
+
+    const urlMethod = props.isEditAlarm === null ? "POST" : "PUT";
+
+    const response = await fetch(endpoint, {
+      method: urlMethod,
       body: JSON.stringify(alarm),
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +66,12 @@ export default function AlarmForm(props) {
       setState(true);
       setError(null);
       setEmptyFields([]);
-      dispatch({ type: "CREATE_ALARM", payload: json });
+      if (props.isEditAlarm === null) {
+        dispatch({ type: "CREATE_ALARM", payload: json });
+      } else {
+        dispatch({ type: "UPDATE_ALARM", payload: json });
+      }
+      props.setIsEditAlarm(null);
       props.handleClose();
     }
   };

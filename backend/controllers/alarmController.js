@@ -84,16 +84,35 @@ const deleteAlarm = async (req, res) => {
 // update an alarm
 const updateAlarm = async (req, res) => {
   const { id } = req.params;
-
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(404).json({ error: "No such alarm" });
+  }
+
+  const { time, title, description } = req.body;
+
+  let emptyFields = [];
+
+  if (!time) {
+    emptyFields.push("time");
+  }
+  if (!title) {
+    emptyFields.push("title");
+  }
+  if (!description) {
+    emptyFields.push("description");
+  }
+  if (emptyFields.length > 0) {
+    return res
+      .status(400)
+      .json({ error: "Please fill in all the fields", emptyFields });
   }
 
   const alarm = await Alarm.findOneAndUpdate(
     { _id: id },
     {
       ...req.body,
-    }
+    },
+    { returnOriginal: false }
   );
 
   if (!alarm) {

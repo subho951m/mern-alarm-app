@@ -16,6 +16,12 @@ export const alarmsReducer = (state, action) => {
       return {
         alarms: state.alarms.filter((w) => w._id !== action.payload._id),
       };
+    case "UPDATE_ALARM":
+      return {
+        alarms: state.alarms.map((w) =>
+          w._id !== action.payload._id ? w : action.payload
+        ),
+      };
     default:
       return state;
   }

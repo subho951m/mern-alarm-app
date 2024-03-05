@@ -8,10 +8,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import { IconButton, ListItemIcon, Switch } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-export default function Alarm({ alarm }) {
+export default function Alarm(props) {
   const { dispatch } = useAlarmsContext();
   const { user } = useAuthContext();
-  const { _id, time, title, description, state } = alarm;
+  const { _id, time, title, description, state } = props.alarm;
 
   const handleDelete = async () => {
     if (!user) {
@@ -31,22 +31,21 @@ export default function Alarm({ alarm }) {
     }
   };
 
+  const handleEdit = () => {
+    props.setIsEditAlarm(props.alarm);
+    props.handleOpen();
+  };
+
   const [checked, setChecked] = useState(state);
 
   return (
     <ListItem
-      secondaryAction={
-        <Switch
-          edge="end"
-          onChange={(event) => setChecked(event.target.checked)}
-          checked={checked}
-        />
-      }
+      secondaryAction={<Switch edge="end" checked={state} />}
       disablePadding
     >
       <ListItemButton>
         <ListItemIcon>
-          <IconButton edge="end" aria-label="delete">
+          <IconButton edge="end" aria-label="delete" onClick={handleEdit}>
             <EditIcon />
           </IconButton>
         </ListItemIcon>

@@ -36,7 +36,11 @@ export default function CardModal(props) {
       >
         <Fade in={props.open}>
           <Box sx={style}>
-            <AlarmForm handleClose={handleClose} />
+            <AlarmForm
+              handleClose={handleClose}
+              isEditAlarm={props.isEditAlarm}
+              setIsEditAlarm={props.setIsEditAlarm}
+            />
           </Box>
         </Fade>
       </Modal>
