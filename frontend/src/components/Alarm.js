@@ -7,6 +7,10 @@ import ListItemText from "@mui/material/ListItemText";
 import EditIcon from "@mui/icons-material/Edit";
 import { IconButton, ListItemIcon, Switch } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import dayjs from "dayjs";
+import "dayjs/locale/en";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 
 export default function Alarm(props) {
   const { dispatch } = useAlarmsContext();
@@ -38,6 +42,12 @@ export default function Alarm(props) {
 
   const [checked, setChecked] = useState(state);
 
+  const parsedDate = dayjs(time);
+  // Format the date to "08:05 PM"
+  const clock = parsedDate.format("hh:mm A");
+  // Format the date to "30-04-2022"
+  const date = parsedDate.format("DD-MM-YYYY");
+
   return (
     <ListItem
       secondaryAction={<Switch edge="end" checked={state} />}
@@ -54,7 +64,7 @@ export default function Alarm(props) {
             <DeleteIcon />
           </IconButton>
         </ListItemIcon>
-        <ListItemText primary={time} secondary={time} sx={{ width: "40%" }} />
+        <ListItemText primary={clock} secondary={date} sx={{ width: "40%" }} />
         <ListItemText
           primary={title}
           secondary={description}

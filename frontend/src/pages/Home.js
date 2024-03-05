@@ -15,6 +15,9 @@ import AddIcon from "@mui/icons-material/Add";
 import Alarm from "../components/Alarm";
 import CardModal from "../components/CardModal";
 import { useState } from "react";
+import dayjs from "dayjs";
+import { Button, Grid, IconButton, Snackbar } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const StyledFab = styled(Fab)({
   position: "absolute",
@@ -28,6 +31,49 @@ const StyledFab = styled(Fab)({
 export default function Home() {
   const { alarms, dispatch } = useAlarmsContext();
   const { user } = useAuthContext();
+
+  const [nextAlarm, setNextAlarm] = useState(null);
+  const [isnotification, setIsNotification] = useState(false);
+  const [notification, setNotification] = useState("");
+
+  useEffect(() => {
+    const findNextAlarm = () => {
+      let nearestAlarm = null;
+
+      alarms.forEach((alarm) => {
+        const now = dayjs();
+        const alarmTime = dayjs(alarm.time);
+        if (
+          alarmTime.isAfter(now) &&
+          (!nearestAlarm || alarmTime.isBefore(dayjs(nearestAlarm.time)))
+        ) {
+          nearestAlarm = alarm;
+        }
+      });
+
+      setNextAlarm(nearestAlarm);
+    };
+
+    const interval = setInterval(() => {
+      if (alarms !== null) findNextAlarm();
+      if (
+        nextAlarm !== null &&
+        dayjs(nextAlarm.time).format("DD-MM-YYYY hh:mm A") ===
+          dayjs().format("DD-MM-YYYY hh:mm A")
+      ) {
+        setIsNotification(true && nextAlarm.state);
+        const detail = `Its ${dayjs(nextAlarm.time).format(
+          "hh:mm A"
+        )} !!! Alarm Name: ${nextAlarm.title} Description: ${
+          nextAlarm.description
+        }`;
+        setNotification(detail);
+        // console.log("Alarm!!!!!");
+      }
+    }, 1000); // Check every second for changes
+
+    return () => clearInterval(interval);
+  }, [alarms, nextAlarm]);
 
   useEffect(() => {
     const fetchAlarms = async () => {
@@ -45,10 +91,27 @@ export default function Home() {
       fetchAlarms();
     }
   }, [dispatch, user]);
+
   const [isEditAlarm, setIsEditAlarm] = useState(null);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
-  console.log(alarms);
+  const handleCloseSnackBar = () => {
+    setIsNotification(false);
+  };
+
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={handleCloseSnackBar}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
+
   return (
     <React.Fragment>
       <CssBaseline />
@@ -62,26 +125,33 @@ export default function Home() {
           My Alarms
         </Typography>
         <List sx={{ mb: 2 }}>
+          <React.Fragment key={`upcoming123`}>
+            <ListSubheader sx={{ bgcolor: "background.paper" }}>
+              Upcoming Alarm
+            </ListSubheader>
+            {nextAlarm && (
+              <Alarm
+                alarm={nextAlarm}
+                setIsEditAlarm={setIsEditAlarm}
+                handleOpen={handleOpen}
+              />
+            )}
+          </React.Fragment>
+          <ListSubheader sx={{ bgcolor: "background.paper" }}>
+            Alarms
+          </ListSubheader>
           {alarms &&
-            alarms.map((alarm) => (
-              <React.Fragment key={alarm._id}>
-                {/* {value === 0 && (
-                <ListSubheader sx={{ bgcolor: "background.paper" }}>
-                  Upcoming Alarm
-                </ListSubheader>
-              )}
-              {value === 1 && (
-                <ListSubheader sx={{ bgcolor: "background.paper" }}>
-                  Alarm
-                </ListSubheader>
-              )} */}
-                <Alarm
-                  alarm={alarm}
-                  setIsEditAlarm={setIsEditAlarm}
-                  handleOpen={handleOpen}
-                />
-              </React.Fragment>
-            ))}
+            alarms
+              .filter((alarm) => !nextAlarm || alarm._id !== nextAlarm._id)
+              .map((alarm) => (
+                <React.Fragment key={alarm._id}>
+                  <Alarm
+                    alarm={alarm}
+                    setIsEditAlarm={setIsEditAlarm}
+                    handleOpen={handleOpen}
+                  />
+                </React.Fragment>
+              ))}
         </List>
       </Paper>
       <AppBar position="fixed" color="primary" sx={{ top: "auto", bottom: 0 }}>
@@ -103,6 +173,14 @@ export default function Home() {
         setOpen={setOpen}
         isEditAlarm={isEditAlarm}
         setIsEditAlarm={setIsEditAlarm}
+      />
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={isnotification}
+        autoHideDuration={10000}
+        onClose={() => setIsNotification(false)}
+        message={notification}
+        action={action}
       />
     </React.Fragment>
   );

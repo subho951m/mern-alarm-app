@@ -13,9 +13,7 @@ export default function AlarmForm(props) {
   const { user } = useAuthContext();
 
   const [time, setTime] = useState(
-    props.isEditAlarm === null
-      ? dayjs("2022-04-17T15:30")
-      : dayjs(props.isEditAlarm.time)
+    props.isEditAlarm === null ? dayjs() : dayjs(props.isEditAlarm.time)
   );
   const [title, setTitle] = useState(
     props.isEditAlarm === null ? "" : props.isEditAlarm.title
