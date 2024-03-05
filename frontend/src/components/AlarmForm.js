@@ -1,35 +1,37 @@
 import { useState } from "react";
+import dayjs from "dayjs";
 import { useAlarmsContext } from "../hooks/useAlarmsContext";
 import { useAuthContext } from "../hooks/useAuthContext";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import DateTime from "./DateTime";
-import { Button } from "@mui/material";
+import { Alert, Button, Stack, Switch } from "@mui/material";
 
 export default function AlarmForm(props) {
   const { dispatch } = useAlarmsContext();
   const { user } = useAuthContext();
 
+  const [time, setTime] = useState(dayjs("2022-04-17T15:30"));
   const [title, setTitle] = useState("");
-  const [load, setLoad] = useState("");
-  const [reps, setReps] = useState("");
+  const [description, setDescription] = useState("");
+  const [state, setState] = useState(true);
   const [error, setError] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     if (!user) {
       setError("You must be logged in");
       return;
     }
 
-    const workout = { title, load, reps };
+    const alarm = { time, title, description, state };
 
-    const response = await fetch("/api/workouts", {
+    const response = await fetch("/api/alarms", {
       method: "POST",
-      body: JSON.stringify(workout),
+      body: JSON.stringify(alarm),
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${user.token}`,
@@ -42,12 +44,14 @@ export default function AlarmForm(props) {
       setEmptyFields(json.emptyFields);
     }
     if (response.ok) {
+      setTime(dayjs("2022-04-17T15:30"));
       setTitle("");
-      setLoad("");
-      setReps("");
+      setDescription("");
+      setState(true);
       setError(null);
       setEmptyFields([]);
-      dispatch({ type: "CREATE_WORKOUT", payload: json });
+      dispatch({ type: "CREATE_ALARM", payload: json });
+      props.handleClose();
     }
   };
   return (
@@ -70,25 +74,41 @@ export default function AlarmForm(props) {
         </Grid>
 
         <Grid item xs={12}>
-          <DateTime onChange={(e) => setTitle(e.target.value)} value={title} />
+          <DateTime setTime={setTime} time={time} />
         </Grid>
 
         <Grid item xs={12}>
           <TextField
             required
-            id="title"
-            name="title"
-            label="Alarm Title"
+            id="description"
+            name="description"
+            label="Alarm Description"
             fullWidth
             variant="standard"
             multiline
             rows={4}
-            onChange={(e) => setTitle(e.target.value)}
-            value={title}
+            onChange={(e) => setDescription(e.target.value)}
+            value={description}
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid item xs={4}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography>Off</Typography>
+            <Switch
+              onChange={(event) => {
+                setState(event.target.checked);
+              }}
+              checked={state}
+              inputProps={{
+                "aria-labelledby": "switch-list-label-wifi",
+              }}
+            />
+            <Typography>On</Typography>
+          </Stack>
+        </Grid>
+
+        <Grid item xs={8}>
           <Grid container justifyContent="flex-end">
             <Button variant="text" onClick={props.handleClose}>
               Cancel
@@ -98,6 +118,12 @@ export default function AlarmForm(props) {
             </Button>
           </Grid>
         </Grid>
+
+        {error && (
+          <Grid item xs={12}>
+            <Alert severity="error">{error}</Alert>
+          </Grid>
+        )}
       </Grid>
     </>
   );

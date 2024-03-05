@@ -1,4 +1,6 @@
-import * as React from "react";
+import { useAlarmsContext } from "../hooks/useAlarmsContext";
+import { useAuthContext } from "../hooks/useAuthContext";
+import { useState } from "react";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
@@ -6,37 +8,41 @@ import EditIcon from "@mui/icons-material/Edit";
 import { IconButton, ListItemIcon, Switch } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-export default function Alarm(props) {
-  const value = props.value;
-  console.log(value);
-  const [checked, setChecked] = React.useState([1]);
+export default function Alarm({ alarm }) {
+  const { dispatch } = useAlarmsContext();
+  const { user } = useAuthContext();
+  const { _id, time, title, description, state } = alarm;
 
-  const handleToggle = (value) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
+  const handleDelete = async () => {
+    if (!user) {
+      return;
     }
 
-    setChecked(newChecked);
+    const response = await fetch("/api/alarms/" + _id, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
+    const json = await response.json();
+
+    if (response.ok) {
+      dispatch({ type: "DELETE_ALARM", payload: json });
+    }
   };
-  const labelId = `checkbox-list-secondary-label-${value}`;
+
+  const [checked, setChecked] = useState(state);
+
   return (
     <ListItem
-      key={value}
       secondaryAction={
         <Switch
           edge="end"
-          onChange={handleToggle(value)}
-          checked={checked.indexOf(value) !== -1}
-          inputProps={{ "aria-labelledby": labelId }}
+          onChange={(event) => setChecked(event.target.checked)}
+          checked={checked}
         />
       }
       disablePadding
-      onClick={props.handleOpen}
     >
       <ListItemButton>
         <ListItemIcon>
@@ -45,19 +51,14 @@ export default function Alarm(props) {
           </IconButton>
         </ListItemIcon>
         <ListItemIcon>
-          <IconButton edge="end" aria-label="delete">
+          <IconButton edge="end" aria-label="delete" onClick={handleDelete}>
             <DeleteIcon />
           </IconButton>
         </ListItemIcon>
+        <ListItemText primary={time} secondary={time} sx={{ width: "40%" }} />
         <ListItemText
-          primary={`08:30 PM`}
-          secondary={"04-03-2024"}
-          sx={{ width: "40%" }}
-        />
-        <ListItemText
-          id={labelId}
-          primary={`Line item ${value + 1}`}
-          secondary={"Secondary text"}
+          primary={title}
+          secondary={description}
           sx={{ width: "60%" }}
         />
       </ListItemButton>

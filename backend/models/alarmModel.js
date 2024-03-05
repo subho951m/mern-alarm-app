@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const alarmSchema = new Schema(
   {
-    alarm_time: {
+    time: {
       type: String,
       required: true,
     },

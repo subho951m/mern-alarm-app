@@ -1,10 +1,9 @@
-import dayjs from "dayjs";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { MobileDateTimePicker } from "@mui/x-date-pickers/MobileDateTimePicker";
 
-export default function DateTime() {
+export default function DateTime(props) {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DemoContainer
@@ -16,7 +15,10 @@ export default function DateTime() {
         ]}
       >
         <DemoItem label="Mobile variant">
-          <MobileDateTimePicker defaultValue={dayjs("2022-04-17T15:30")} />
+          <MobileDateTimePicker
+            value={props.time}
+            onChange={(newValue) => props.setTime(newValue)}
+          />
         </DemoItem>
       </DemoContainer>
     </LocalizationProvider>

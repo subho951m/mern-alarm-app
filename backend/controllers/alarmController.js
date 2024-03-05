@@ -29,21 +29,18 @@ const getAlarm = async (req, res) => {
 
 // create new alarm
 const createAlarm = async (req, res) => {
-  const { alarm_time, title, description, state } = req.body;
+  const { time, title, description, state } = req.body;
 
   let emptyFields = [];
 
-  if (!alarm_time) {
-    emptyFields.push("alarm_time");
+  if (!time) {
+    emptyFields.push("time");
   }
   if (!title) {
     emptyFields.push("title");
   }
   if (!description) {
     emptyFields.push("description");
-  }
-  if (!state) {
-    emptyFields.push("state");
   }
   if (emptyFields.length > 0) {
     return res
@@ -55,7 +52,7 @@ const createAlarm = async (req, res) => {
   try {
     const user_id = req.user._id;
     const alarm = await Alarm.create({
-      alarm_time,
+      time,
       title,
       description,
       state,

@@ -61,9 +61,10 @@ export default function Home() {
           My Alarms
         </Typography>
         <List sx={{ mb: 2 }}>
-          {/* {alarms.map((value) => (
-            <React.Fragment key={value}>
-              {value === 0 && (
+          {alarms &&
+            alarms.map((alarm) => (
+              <React.Fragment key={alarm._id}>
+                {/* {value === 0 && (
                 <ListSubheader sx={{ bgcolor: "background.paper" }}>
                   Upcoming Alarm
                 </ListSubheader>
@@ -72,10 +73,10 @@ export default function Home() {
                 <ListSubheader sx={{ bgcolor: "background.paper" }}>
                   Alarm
                 </ListSubheader>
-              )}
-              <Alarm value={value} handleOpen={handleOpen} />
-            </React.Fragment>
-          ))} */}
+              )} */}
+                <Alarm alarm={alarm} />
+              </React.Fragment>
+            ))}
         </List>
       </Paper>
       <AppBar position="fixed" color="primary" sx={{ top: "auto", bottom: 0 }}>
