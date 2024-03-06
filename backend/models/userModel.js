@@ -63,4 +63,31 @@ userSchema.statics.login = async function (username, password) {
   return user;
 };
 
+// static reset method
+userSchema.statics.reset = async function (mastername, password) {
+  if (!mastername || !password) {
+    throw Error("All fields must be filled");
+  }
+
+  if (!validator.isStrongPassword(password)) {
+    throw Error("Password not strong enough");
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  const hash = await bcrypt.hash(password, salt);
+
+  const user = await this.findOneAndUpdate(
+    { username: mastername },
+    {
+      ...{ password: hash },
+    },
+    { returnOriginal: false }
+  );
+  if (!user) {
+    return res.status(400).json({ error: "No such Username exists" });
+  }
+
+  return user;
+};
+
 module.exports = mongoose.model("User", userSchema);
