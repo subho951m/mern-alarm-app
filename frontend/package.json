@@ -24,8 +24,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build:dev": "rmdir /s /q build && env-cmd -x -f .env.dev npm run build",
-    "build:prod": "rmdir /s /q build && env-cmd -f .env npm run build",
+    "build:dev": "rm -rf build && env-cmd -x -f .env.dev npm run build",
+    "build:prod": "rm -rf build && env-cmd -f .env npm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
