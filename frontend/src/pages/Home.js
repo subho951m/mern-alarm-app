@@ -77,9 +77,12 @@ export default function Home() {
 
   useEffect(() => {
     const fetchAlarms = async () => {
-      const response = await fetch("/api/alarms", {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/alarms`,
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
+      );
       const json = await response.json();
 
       if (response.ok) {

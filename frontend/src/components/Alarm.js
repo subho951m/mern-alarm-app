@@ -22,12 +22,15 @@ export default function Alarm(props) {
       return;
     }
 
-    const response = await fetch("/api/alarms/" + _id, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/alarms/` + _id,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      }
+    );
     const json = await response.json();
 
     if (response.ok) {

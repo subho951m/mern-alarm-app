@@ -37,7 +37,7 @@ export default function AlarmForm(props) {
 
     const alarm = { time, title, description, state };
 
-    const endpoint = `/api/alarms${
+    const endpoint = `${process.env.REACT_APP_API_URL}/api/alarms${
       props.isEditAlarm === null ? "" : `/${props.isEditAlarm._id}`
     }`;
 
